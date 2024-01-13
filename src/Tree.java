@@ -19,7 +19,52 @@ public class Tree {
 //            iGain(entropies[i], weight, );
         }
     }
-    public float entropy(float[] labels){
+
+    public float[] calculateEntropies(float[][] attributes) {
+        MyLinkedList nodes;
+        MyLinkedList numbs = new MyLinkedList();
+        for (int i = 0; i < attributes[0].length; i++) {
+            if (numbs.isEmpty()) {
+                numbs.add(attributes[i][0]);
+            }
+            else {
+                int j = 0;
+                for (; j < numbs.size(); j++) {
+                    if ((float) numbs.get(j).getData() == attributes[i][0]) {
+                        break;
+                    }
+
+                }
+                if (j == numbs.size()) {
+                    numbs.add(attributes[i][0]);
+                }
+            }
+        }
+        int[] uniques = new int[numbs.size()];
+        float[] values = new  float[uniques.length];
+        for (int i = 0; i < numbs.size(); i++) {
+            values[i] = (float) numbs.get(i).getData();
+        }
+        for (int i = 0; i < attributes[0].length; i++) {
+            for (int j = 0; j < values.length; j++) {
+                if (attributes[i][0] == values[j]) {
+                    uniques[j]++;
+                    break;
+                }
+            }
+        }
+        float[] entropies = new float[uniques.length];
+        for (int i = 0; i < uniques.length; i++) {
+            float[] labels = new float[uniques[i]];
+            int k = 0;
+            for (int j = 0; j < attributes.length; j++) {
+                if (attributes[j][0] == values[i]) {
+                    labels[k++] = attributes[j][1];
+            }
+            entropies[i] = entropy(labels);
+        }
+    }
+    public static float entropy(float[] labels){
         //todo change log
         float num = 0;
         int count = 0;
