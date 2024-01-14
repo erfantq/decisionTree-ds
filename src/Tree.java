@@ -9,11 +9,12 @@ public class Tree {
         return depth;
     }
     public void createTree(float[][] data, float[] labels){
-        //todo implementation
-        float[] iGains = new float[data.length];
+        //TODO make this recursive and stop pure nodes from splitting
+        float[] iGains = new float[data[0].length];
         float[] inputLabels = new float[data.length];
         float[] entropies;
         float[][] calculateChildrenEntropiesInput = new float[data.length][2];
+        float pEntropy = entropy(labels);
         for (int i = 0; i < labels.length; i++)
             calculateChildrenEntropiesInput[i][1] = labels[i];
         for (int i = 0; i < data[0].length; i++) {
@@ -21,7 +22,6 @@ public class Tree {
                 calculateChildrenEntropiesInput[j][0] = data[j][i];
             }
             entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput);
-            float pEntropy = entropy(labels);
             iGains[i] = iGain(pEntropy, weight, entropies);
         }
         float max = -1f;
@@ -38,7 +38,7 @@ public class Tree {
     private float[] calculateChildrenEntropies(float[][] attributes) {  //calculates children entropies and weights
         MyLinkedList nodes;
         MyLinkedList numbs = new MyLinkedList();
-        for (int i = 0; i < attributes[0].length; i++) {
+        for (int i = 0; i < attributes.length; i++) {
             if (numbs.isEmpty()) {
                 numbs.add(attributes[i][0]);
             } else {
@@ -60,7 +60,7 @@ public class Tree {
         for (int i = 0; i < numbs.size(); i++) {
             values[i] = (float) numbs.get(i).getData();
         }
-        for (int i = 0; i < attributes[0].length; i++) {
+        for (int i = 0; i < attributes.length; i++) {
             for (int j = 0; j < values.length; j++) {
                 if (attributes[i][0] == values[j]) {
                     uniques[j]++;
@@ -79,8 +79,8 @@ public class Tree {
                 if (attributes[j][0] == values[i]) {
                     labels[k++] = attributes[j][1];
                 }
-                entropies[i] = entropy(labels);
             }
+            entropies[i] = entropy(labels);
         }
         return entropies;
     }
@@ -117,7 +117,7 @@ public class Tree {
                 }
             }
             p = (float) count / labels.length;
-            sum += p * Math.log10(p);
+            sum += (float) (p * Math.log10(p));
         }
         return -sum;
     }
