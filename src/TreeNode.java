@@ -1,12 +1,16 @@
-import sjh.T;
-
 public class TreeNode {
     float[][] data;
     TreeNode[] nodes;
-
-    boolean pureNode = false;
+    private int index; //determines with what attribute the node has been splitted
+    private float value; //determines with what value from parent splitted node
+    private boolean pureNode = true;
+    public float[] labels;
+    public boolean getPureNode(){
+        return pureNode;
+    }
 
     public void split(int index) {
+        this.index = index;
         MyLinkedList numbs = new MyLinkedList();
         for (int i = 0; i < data.length; i++) {
             if (numbs.isEmpty()) {
@@ -24,7 +28,7 @@ public class TreeNode {
             }
         }
         nodes = new TreeNode[numbs.size()];
-        int[] uniques = new int[numbs.size()];
+        int[] uniques = new int[nodes.length];
         float[] values = new float[uniques.length];
         for (int i = 0; i < numbs.size(); i++) {
             values[i] = (float) numbs.get(i).getData();
@@ -37,22 +41,49 @@ public class TreeNode {
                 }
             }
         }
-        for (int i = 0; i < nodes.length; i++) {
-            nodes[i] = new TreeNode();
-        }
-
-        float[] entropies = new float[uniques.length];
-        for (int i = 0; i < uniques.length; i++) {
-            float[] labels = new float[uniques[i]];
-            int k = 0;
-            for (int j = 0; j < attributes.length; j++) {
-                if (attributes[j][0] == values[i]) {
-                    labels[k++] = attributes[j][1];
+        float[][][] allIndexes = new float[uniques.length][][];  //[total children nodes][number of elements in that child][number of data columns]
+        float[][] allLabels = new float[uniques.length][];  //[total children nodes][number of elements in that child]
+        for (int i = 0; i < allIndexes.length; i++) {
+            allIndexes[i] = new float[uniques[i]][data[0].length];
+            allLabels[i] = new float[uniques[i]];
+            int c = 0;
+            for (int j = 0; j < data.length; j++) {
+                if (data[j][index] == values[i]) {
+                    allIndexes[i][c] = data[j];
+                    allLabels[i][c] = labels[j];
+                    c++;
                 }
             }
-            entropies[i] = entropy(labels);
         }
-        return entropies;
+        for (int i = 0; i < nodes.length; i++) {
+            nodes[i] = new TreeNode(allIndexes[i], allLabels[i], values[i]);
+        }
+        data = null;
+        labels = null;
     }
+    public TreeNode(float[][] data,float[] labels, float value) {
+        this.data = data;
+        this.value = value;
+        this.labels = labels;
+        float save = labels[0];
+        for (int i = 1; i < labels.length; i++) {
+            if (labels[i] != save) {
+                pureNode = false;
+                break;
+            }
+        }
+    }
+    public TreeNode(float[][] data,float[] labels) {
+        this.data = data;
+        this.labels = labels;
+        float save = labels[0];
+        for (int i = 1; i < labels.length; i++) {
+            if (labels[i] != save) {
+                pureNode = false;
+                break;
+            }
+        }
+    }
+
 
 }

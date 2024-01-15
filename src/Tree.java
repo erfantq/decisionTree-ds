@@ -1,5 +1,6 @@
 
 public class Tree {
+    TreeNode root;
 
     private int depth;
     private float[] weight;
@@ -9,18 +10,18 @@ public class Tree {
     public int getDepth(){
         return depth;
     }
-    public void createTree(float[][] data, float[] labels){
-        //TODO make this recursive and stop pure nodes from splitting
-        float[] iGains = new float[data[0].length];
-        float[] inputLabels = new float[data.length];
+
+    private void createTreeRecursive(TreeNode node) {
+        float[] iGains = new float[node.data[0].length];
+        float[] inputLabels = new float[node.data.length];
         float[] entropies;
-        float[][] calculateChildrenEntropiesInput = new float[data.length][2];
-        float pEntropy = entropy(labels);
-        for (int i = 0; i < labels.length; i++)
-            calculateChildrenEntropiesInput[i][1] = labels[i];
-        for (int i = 0; i < data[0].length; i++) {
-            for (int j = 0; j < data.length; j++) {
-                calculateChildrenEntropiesInput[j][0] = data[j][i];
+        float[][] calculateChildrenEntropiesInput = new float[node.data.length][2];
+        float pEntropy = entropy(node.labels);
+        for (int i = 0; i < node.labels.length; i++)
+            calculateChildrenEntropiesInput[i][1] = node.labels[i];
+        for (int i = 0; i < node.data[0].length; i++) {
+            for (int j = 0; j < node.data.length; j++) {
+                calculateChildrenEntropiesInput[j][0] = node.data[j][i];
             }
             entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput);
             iGains[i] = iGain(pEntropy, weight, entropies);
@@ -33,7 +34,15 @@ public class Tree {
                 j = i;
             }
         }
+        root.split(j);
+    }
+    public void createTree(float[][] data, float[] labels){
+        //TODO make this recursive and stop pure nodes from splitting
+        root = new TreeNode(data, labels);
+        //iGains calculated
+        if (!root.getPureNode()){
 
+        }
     }
 
     public int countUniques(float[][] data, int index) {
