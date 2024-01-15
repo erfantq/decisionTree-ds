@@ -1,5 +1,6 @@
 
 public class Tree {
+
     private int depth;
     private float[] weight;
     public Tree(){
@@ -33,6 +34,26 @@ public class Tree {
             }
         }
 
+    }
+
+    public int countUniques(float[][] data, int index) {
+        MyLinkedList numbs = new MyLinkedList();
+        for (int i = 0; i < data.length; i++) {
+            if (numbs.isEmpty()) {
+                numbs.add(data[i][index]);
+            } else {
+                int j = 0;
+                for (; j < numbs.size(); j++) {
+                    if ((float) numbs.get(j).getData() == data[i][index]) {
+                        break;
+                    }
+                }
+                if (j == numbs.size()) {
+                    numbs.add(data[i][index]);
+                }
+            }
+        }
+        return numbs.size();
     }
 
     private float[] calculateChildrenEntropies(float[][] attributes) {  //calculates children entropies and weights
