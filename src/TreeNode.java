@@ -1,33 +1,18 @@
 public class TreeNode {
     float[][] data;
     TreeNode[] nodes;
-    private int index; //determines with what attribute the node has been splitted
-    private float value; //determines with what value from parent splitted node
+    private int index; //determines with what attribute the node has been split
+    private float value; //determines with what value from parent this node has been split
     private boolean pureNode = true;
     public float[] labels;
-    public boolean getPureNode(){
+    public boolean isPureNode(){
         return pureNode;
     }
 
     public void split(int index) {
         this.index = index;
         MyLinkedList numbs = new MyLinkedList();
-        for (int i = 0; i < data.length; i++) {
-            if (numbs.isEmpty()) {
-                numbs.add(data[i][index]);
-            } else {
-                int j = 0;
-                for (; j < numbs.size(); j++) {
-                    if ((float) numbs.get(j).getData() == data[i][index]) {
-                        break;
-                    }
-                }
-                if (j == numbs.size()) {
-                    numbs.add(data[i][index]);
-                }
-            }
-        }
-        nodes = new TreeNode[numbs.size()];
+        nodes = new TreeNode[Tree.countUniques(data, index, numbs)];
         int[] uniques = new int[nodes.length];
         float[] values = new float[uniques.length];
         for (int i = 0; i < numbs.size(); i++) {

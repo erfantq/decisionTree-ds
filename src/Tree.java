@@ -3,7 +3,6 @@ public class Tree {
     TreeNode root;
 
     private int depth;
-    private float[] weight;
     public Tree(){
 
     }
@@ -13,8 +12,8 @@ public class Tree {
 
     private void createTreeRecursive(TreeNode node) {
         float[] iGains = new float[node.data[0].length];
-        float[] inputLabels = new float[node.data.length];
         float[] entropies;
+        Weights weights = new Weights();
         float[][] calculateChildrenEntropiesInput = new float[node.data.length][2];
         float pEntropy = entropy(node.labels);
         for (int i = 0; i < node.labels.length; i++)
@@ -23,8 +22,8 @@ public class Tree {
             for (int j = 0; j < node.data.length; j++) {
                 calculateChildrenEntropiesInput[j][0] = node.data[j][i];
             }
-            entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput);
-            iGains[i] = iGain(pEntropy, weight, entropies);
+            entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput, weights);
+            iGains[i] = iGain(pEntropy, weights.w, entropies);
         }
         float max = -1f;
         int j = 0;
@@ -34,19 +33,22 @@ public class Tree {
                 j = i;
             }
         }
-        root.split(j);
+        //iGains calculated
+        node.split(j);
+        for (int i = 0; i < node.nodes.length; i++) {
+            if (!node.nodes[i].isPureNode()) {
+                createTreeRecursive(node.nodes[i]);
+            }
+        }
     }
     public void createTree(float[][] data, float[] labels){
-        //TODO make this recursive and stop pure nodes from splitting
         root = new TreeNode(data, labels);
-        //iGains calculated
-        if (!root.getPureNode()){
-
+        if (!root.isPureNode()){
+            createTreeRecursive(root);
         }
     }
 
-    public int countUniques(float[][] data, int index) {
-        MyLinkedList numbs = new MyLinkedList();
+    public static int countUniques(float[][] data, int index, MyLinkedList numbs) {
         for (int i = 0; i < data.length; i++) {
             if (numbs.isEmpty()) {
                 numbs.add(data[i][index]);
@@ -65,27 +67,10 @@ public class Tree {
         return numbs.size();
     }
 
-    private float[] calculateChildrenEntropies(float[][] attributes) {  //calculates children entropies and weights
-        MyLinkedList nodes;
+    private float[] calculateChildrenEntropies(float[][] attributes, Weights weights) {  //calculates children entropies and weights
         MyLinkedList numbs = new MyLinkedList();
-        for (int i = 0; i < attributes.length; i++) {
-            if (numbs.isEmpty()) {
-                numbs.add(attributes[i][0]);
-            } else {
-                int j = 0;
-                for (; j < numbs.size(); j++) {
-                    if ((float) numbs.get(j).getData() == attributes[i][0]) {
-                        break;
-                    }
-
-                }
-                if (j == numbs.size()) {
-                    numbs.add(attributes[i][0]);
-                }
-            }
-        }
-        int[] uniques = new int[numbs.size()];
-        weight = new float[uniques.length];
+        int[] uniques = new int[countUniques(attributes, 0, numbs)];
+        weights.w = new float[uniques.length];
         float[] values = new float[uniques.length];
         for (int i = 0; i < numbs.size(); i++) {
             values[i] = (float) numbs.get(i).getData();
@@ -98,8 +83,8 @@ public class Tree {
                 }
             }
         }
-        for (int i = 0; i < weight.length; i++) {
-            weight[i] = (float) uniques[i] / attributes.length;
+        for (int i = 0; i < weights.w.length; i++) {
+            weights.w[i] = (float) uniques[i] / attributes.length;
         }
         float[] entropies = new float[uniques.length];
         for (int i = 0; i < uniques.length; i++) {
