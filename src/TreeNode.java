@@ -1,12 +1,26 @@
 public class TreeNode {
     float[][] data;
-    TreeNode[] nodes;
+    public TreeNode[] nodes;
     private int index; //determines with what attribute the node has been split
     private float value; //determines with what value from parent this node has been split
     private boolean pureNode = true;
     public float[] labels;
+    private float maxOutput;
+
+    public float getMaxOutput() {
+        return maxOutput;
+    }
+
     public boolean isPureNode(){
         return pureNode;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public float getValue() {
+        return value;
     }
 
     public void split(int index) {
@@ -61,14 +75,45 @@ public class TreeNode {
     public TreeNode(float[][] data,float[] labels) {
         this.data = data;
         this.labels = labels;
-        float save = labels[0];
+        MyLinkedList saveLabels = new MyLinkedList();
+        saveLabels.add(labels[0]);
+        saveLabels.get(0).incrementCount();
         for (int i = 1; i < labels.length; i++) {
-            if (labels[i] != save) {
-                pureNode = false;
+            int j = 0;
+            for (; j < saveLabels.size(); j++){
+                if ((float) saveLabels.get(j).getData() == labels[i]) {
+                    saveLabels.get(j).incrementCount();
+                    break;
+                }
+                if (j == saveLabels.size()) {
+                    saveLabels.add(labels[i]);
+                    saveLabels.get(saveLabels.size()-1).incrementCount();
+                }
+            }
+        }
+        int[] counts = new int[saveLabels.size()];
+        for (int i = 0; i < counts.length; i++) {
+            counts[i] = saveLabels.get(i).getCount();
+        }
+        float[] percents = new float[counts.length];
+        for (int i = 0; i < percents.length; i++) {
+            percents[i] = (float) counts[i] / labels.length;
+        }
+        float maxPercent = -1f;
+        int maxIndex = 0;
+        for (int i = 0; i < percents[i]; i++) {
+            if (percents[i] > maxPercent) {
+                maxPercent = percents[i];
+                maxIndex = i;
+            }
+            if (percents[i] >= 0.8f) {
+                maxOutput = (float) saveLabels.get(i).getData();
+                pureNode = true;
                 break;
             }
         }
+        if (!pureNode) {
+            maxOutput = (float) saveLabels.get(maxIndex).getData();
+        }
     }
-
-
 }

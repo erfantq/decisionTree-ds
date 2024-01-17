@@ -1,6 +1,7 @@
 
 public class MyNode{
     private Object data;
+    private int count;
     private MyNode next;
     public MyNode() {
         this(0);
@@ -15,6 +16,15 @@ public class MyNode{
     public Object getData() {
         return data;
     }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void incrementCount() {
+        count++;
+    }
+
     public void setNext(MyNode next){
         this.next = next;
     }

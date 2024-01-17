@@ -3,14 +3,15 @@ public class Tree {
     TreeNode root;
 
     private int depth;
-    public Tree(){
-
-    }
     public int getDepth(){
         return depth;
     }
 
-    private void createTreeRecursive(TreeNode node) {
+    private void createTreeRecursive(TreeNode node, int currentDepth) {
+        currentDepth++;
+        if (currentDepth > depth){
+            depth = currentDepth;
+        }
         float[] iGains = new float[node.data[0].length];
         float[] entropies;
         Weights weights = new Weights();
@@ -37,14 +38,14 @@ public class Tree {
         node.split(j);
         for (int i = 0; i < node.nodes.length; i++) {
             if (!node.nodes[i].isPureNode()) {
-                createTreeRecursive(node.nodes[i]);
+                createTreeRecursive(node.nodes[i], currentDepth);
             }
         }
     }
     public void createTree(float[][] data, float[] labels){
         root = new TreeNode(data, labels);
         if (!root.isPureNode()){
-            createTreeRecursive(root);
+            createTreeRecursive(root, 0);
         }
     }
 
