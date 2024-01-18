@@ -39,6 +39,7 @@ public class Main {
             labels = queue.returnAll1D();
             //creating tree
             dTreeClassifier = new DTreeClassifier(data, labels);
+            System.out.println("Depth: " + dTreeClassifier.tree.getDepth());
             //reading test data
             inputStream = new Scanner(new File("feature_test.csv"));
             inputStream.next();

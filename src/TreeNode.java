@@ -15,6 +15,10 @@ public class TreeNode {
         return pureNode;
     }
 
+    public void setPureNode(boolean pureNode) {
+        this.pureNode = pureNode;
+    }
+
     public int getIndex() {
         return index;
     }

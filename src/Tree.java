@@ -2,6 +2,8 @@
 public class Tree {
     TreeNode root;
 
+    private int columns;
+
     private int depth;
     public int getDepth(){
         return depth;
@@ -9,6 +11,10 @@ public class Tree {
 
     private void createTreeRecursive(TreeNode node, int currentDepth) {
         currentDepth++;
+        if (currentDepth > columns * 0.8) {
+            node.setPureNode(true);
+            return;
+        }
         if (currentDepth > depth){
             depth = currentDepth;
         }
@@ -51,6 +57,7 @@ public class Tree {
         }
     }
     public void createTree(float[][] data, float[] labels){
+        columns = data[0].length;
         root = new TreeNode(data, labels);
         if (!root.isPureNode()){
             createTreeRecursive(root, 0);
