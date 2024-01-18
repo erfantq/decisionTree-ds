@@ -1,10 +1,6 @@
-public class DTreeClassifire {
-    private float[][] data;
-    private float[] labels;
-    private Tree tree;
-    public DTreeClassifire(float[][] data, float[] labels){
-        this.data = data;
-        this.labels = labels;
+public class DTreeClassifier {
+    public Tree tree;
+    public DTreeClassifier(float[][] data, float[] labels){
         tree = new Tree();
         tree.createTree(data, labels);
     }
@@ -21,18 +17,21 @@ public class DTreeClassifire {
         TreeNode current = tree.root;
         int count = 0;
         while (!current.isPureNode() && count < depth) {
+            boolean broke = false;
             for (int i = 0; i < current.nodes.length; i++) {
                 if (data[current.getIndex()] == current.nodes[i].getValue()) {
                     current = current.nodes[i];
                     count++;
+                    broke = true;
                     break;
                 }
             }
+            if (!broke) break;
         }
         return current.getMaxOutput();
     }
 
-    public float accuracy(int[] labels, int[] labelsPredicted){
+    public float accuracy(float[] labels, float[] labelsPredicted){
         int countCorrectLabels = 0;
         float result = 0.0f;
         for (int i = 0; i < labels.length; i++) {
@@ -40,7 +39,7 @@ public class DTreeClassifire {
                 countCorrectLabels++;
             }
         }
-        result = (countCorrectLabels / labelsPredicted.length) * 100;
+        result = ((float) countCorrectLabels / labelsPredicted.length) * 100;
         return result;
     }
 }

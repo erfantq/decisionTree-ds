@@ -3,7 +3,7 @@ public class TreeNode {
     public TreeNode[] nodes;
     private int index; //determines with what attribute the node has been split
     private float value; //determines with what value from parent this node has been split
-    private boolean pureNode = true;
+    private boolean pureNode = false;
     public float[] labels;
     private float maxOutput;
 
@@ -23,10 +23,15 @@ public class TreeNode {
         return value;
     }
 
-    public void split(int index) {
+    public boolean split(int index) {
         this.index = index;
         MyLinkedList numbs = new MyLinkedList();
-        nodes = new TreeNode[Tree.countUniques(data, index, numbs)];
+        int count = Tree.countUniques(data, index, numbs);
+        if (count == 1) {
+            pureNode = true;
+            return false;
+        }
+        nodes = new TreeNode[count];
         int[] uniques = new int[nodes.length];
         float[] values = new float[uniques.length];
         for (int i = 0; i < numbs.size(); i++) {
@@ -57,20 +62,11 @@ public class TreeNode {
         for (int i = 0; i < nodes.length; i++) {
             nodes[i] = new TreeNode(allIndexes[i], allLabels[i], values[i]);
         }
-        data = null;
-        labels = null;
+        return true;
     }
     public TreeNode(float[][] data,float[] labels, float value) {
-        this.data = data;
+        this(data, labels);
         this.value = value;
-        this.labels = labels;
-        float save = labels[0];
-        for (int i = 1; i < labels.length; i++) {
-            if (labels[i] != save) {
-                pureNode = false;
-                break;
-            }
-        }
     }
     public TreeNode(float[][] data,float[] labels) {
         this.data = data;
@@ -80,15 +76,15 @@ public class TreeNode {
         saveLabels.get(0).incrementCount();
         for (int i = 1; i < labels.length; i++) {
             int j = 0;
-            for (; j < saveLabels.size(); j++){
+            for (; j < saveLabels.size();j++){
                 if ((float) saveLabels.get(j).getData() == labels[i]) {
                     saveLabels.get(j).incrementCount();
                     break;
                 }
-                if (j == saveLabels.size()) {
-                    saveLabels.add(labels[i]);
-                    saveLabels.get(saveLabels.size()-1).incrementCount();
-                }
+            }
+            if (j == saveLabels.size()) {
+                saveLabels.add(labels[i]);
+                saveLabels.get(saveLabels.size()-1).incrementCount();
             }
         }
         int[] counts = new int[saveLabels.size()];
@@ -101,14 +97,16 @@ public class TreeNode {
         }
         float maxPercent = -1f;
         int maxIndex = 0;
-        for (int i = 0; i < percents[i]; i++) {
+        for (int i = 0; i < percents.length; i++) {
             if (percents[i] > maxPercent) {
                 maxPercent = percents[i];
                 maxIndex = i;
             }
-            if (percents[i] >= 0.8f) {
+            if (percents[i] >= 0.9f) {
                 maxOutput = (float) saveLabels.get(i).getData();
                 pureNode = true;
+                this.data = null;
+                this.labels = null;
                 break;
             }
         }

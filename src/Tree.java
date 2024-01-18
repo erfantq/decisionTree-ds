@@ -12,33 +12,41 @@ public class Tree {
         if (currentDepth > depth){
             depth = currentDepth;
         }
-        float[] iGains = new float[node.data[0].length];
-        float[] entropies;
-        Weights weights = new Weights();
-        float[][] calculateChildrenEntropiesInput = new float[node.data.length][2];
-        float pEntropy = entropy(node.labels);
-        for (int i = 0; i < node.labels.length; i++)
-            calculateChildrenEntropiesInput[i][1] = node.labels[i];
-        for (int i = 0; i < node.data[0].length; i++) {
-            for (int j = 0; j < node.data.length; j++) {
-                calculateChildrenEntropiesInput[j][0] = node.data[j][i];
+        int splitIndex = 0;
+        {
+            float[] iGains = new float[node.data[0].length];
+            float[] entropies;
+            Weights weights = new Weights();
+            float[][] calculateChildrenEntropiesInput = new float[node.data.length][2];
+            float pEntropy = entropy(node.labels);
+            for (int i = 0; i < node.labels.length; i++)
+                calculateChildrenEntropiesInput[i][1] = node.labels[i];
+            for (int i = 0; i < node.data[0].length; i++) {
+                for (int j = 0; j < node.data.length; j++) {
+                    calculateChildrenEntropiesInput[j][0] = node.data[j][i];
+                }
+                entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput, weights);
+                iGains[i] = iGain(pEntropy, weights.w, entropies);
             }
-            entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput, weights);
-            iGains[i] = iGain(pEntropy, weights.w, entropies);
-        }
-        float max = -1f;
-        int j = 0;
-        for (int i = 0; i < iGains.length; i++) {
-            if (max < iGains[i]) {
-                max = iGains[i];
-                j = i;
+            float max = -1f;
+            for (int i = 0; i < iGains.length; i++) {
+                if (max < iGains[i]) {
+                    max = iGains[i];
+                    splitIndex = i;
+                }
             }
         }
         //iGains calculated
-        node.split(j);
-        for (int i = 0; i < node.nodes.length; i++) {
-            if (!node.nodes[i].isPureNode()) {
-                createTreeRecursive(node.nodes[i], currentDepth);
+        if (node.split(splitIndex)) {
+            if (node.nodes.length == 1) {
+                System.out.println("bad");
+            }
+            node.data = null;
+            node.labels = null;
+            for (int i = 0; i < node.nodes.length; i++) {
+                if (!node.nodes[i].isPureNode()) {
+                    createTreeRecursive(node.nodes[i], currentDepth);
+                }
             }
         }
     }
