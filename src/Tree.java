@@ -56,9 +56,6 @@ public class Tree {
             }
             for (int i = 0; i < iGains.length; i++) {
                 if(node.split(indexes[i])) {
-                    if (node.nodes.length == 1) {
-                        System.out.println("bad");
-                    }
                     node.data = null;
                     node.labels = null;
                     for (int j = 0; j < node.nodes.length; j++) {
