@@ -34,16 +34,52 @@ public class Tree {
                 entropies = calculateChildrenEntropies(calculateChildrenEntropiesInput, weights);
                 iGains[i] = iGain(pEntropy, weights.w, entropies);
             }
-            float max = -1f;
+            int[] indexes = new int[iGains.length];
+            for (int i = 0; i < iGains.length; i++) {
+                indexes[i] = i;
+            }
+            int n = iGains.length;
+            boolean sw = true;
+            for (int i = n-1; i > 0 && sw; i--) {
+                sw = false;
+                for (int j = 0; j < i; j++) {
+                    if (iGains[j] > iGains[j+1]) {
+                        int temp1 = indexes[j];
+                        float temp2 = iGains[j];
+                        indexes[j] = indexes[j+1];
+                        indexes[j+1] = temp1;
+                        iGains[j] = iGains[j+1];
+                        iGains[j+1] = temp2;
+                        sw = true;
+                    }
+                }
+            }
+            for (int i = 0; i < iGains.length; i++) {
+                if(node.split(indexes[i])) {
+                    if (node.nodes.length == 1) {
+                        System.out.println("bad");
+                    }
+                    node.data = null;
+                    node.labels = null;
+                    for (int j = 0; j < node.nodes.length; j++) {
+                        if (!node.nodes[j].isPureNode()) {
+                            createTreeRecursive(node.nodes[j], currentDepth);
+                        }
+                    }
+                    break;
+                }
+            }
+            /*float max = -1f;
+            
             for (int i = 0; i < iGains.length; i++) {
                 if (max < iGains[i]) {
                     max = iGains[i];
                     splitIndex = i;
                 }
-            }
+            }*/
         }
         //iGains calculated
-        if (node.split(splitIndex)) {
+        /*if (node.split(splitIndex)) {
             if (node.nodes.length == 1) {
                 System.out.println("bad");
             }
@@ -54,7 +90,7 @@ public class Tree {
                     createTreeRecursive(node.nodes[i], currentDepth);
                 }
             }
-        }
+        }*/
     }
     public void createTree(float[][] data, float[] labels){
         columns = data[0].length;
@@ -117,17 +153,15 @@ public class Tree {
     }
     public float entropy(float[] labels){
         //todo change log
-        float num = 0;
+        float num = 0f;
         int count = 0;
         float p = 0.0f;
         boolean isFirst = true;
         float sum = 0.0f;
         MyLinkedList tempNumbers = new MyLinkedList();
         for (int i = 0; i < labels.length; i++) {
-            count = 0;
             if (isFirst){
                 tempNumbers.add(labels[i]);
-                num = labels[i];
                 isFirst = false;
             } else {
                 boolean doesExist = false;
